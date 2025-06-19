@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="manifest" href="manifest.json">
-
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Beehive Monitor - Live</title>
@@ -138,6 +136,12 @@
       <div class="label">Humidity</div>
       <div class="value"><span id="hum">--</span> %</div>
     </div>
+
+    <div class="card">
+      <div class="emoji">🧪</div>
+      <div class="label">Air Purity</div>
+      <div class="value"><span id="air">--</span> %</div>
+    </div>
   </div>
 
   <div class="nav">
@@ -168,6 +172,7 @@
       const data = snapshot.val() || {};
       document.getElementById("temp").innerText = data.temperature ?? "--";
       document.getElementById("hum").innerText = data.humidity ?? "--";
+      document.getElementById("air").innerText = data.air_quality ?? "--";
     });
   </script>
 </body>
