@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Beehive Monitor - Live</title>
+
+  <style>
+    :root {
+      --bg: #f9fbff;
+      --fg: #333;
+      --card: #fff;
+      --buttonBg: #2d3e50;
+      --buttonFg: #fff;
+    }
+    .dark {
+      --bg: #2b2e3b;
+      --fg: #ddd;
+      --card: #3a3f4b;
+      --buttonBg: #ddd;
+      --buttonFg: #2d3e50;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Times New Roman', Times, serif;
+      padding: 20px;
+      background: var(--bg);
+      color: var(--fg);
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    .header {
+      text-align: center;
+      background: var(--buttonBg);
+      color: var(--buttonFg);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      padding: 30px;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      background-color: var(--card);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      padding: 20px;
+      width: 220px;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: scale(1.03);
+    }
+
+    .emoji {
+      font-size: 36px;
+      margin-bottom: 10px;
+    }
+
+    .label {
+      font-weight: 600;
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+
+    .value {
+      font-size: 24px;
+      color: var(--fg);
+    }
+
+    .nav {
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .card-tile {
+      display: inline-block;
+      background-color: var(--card);
+      border-radius: 16px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
+      padding: 10px 25px;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--buttonBg);
+      text-decoration: none;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card-tile:hover {
+      transform: scale(1.05);
+      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--buttonBg);
+      color: var(--buttonFg);
+      border: none;
+      padding: 10px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      font-family: 'Times New Roman', Times, serif;
+    }
+  </style>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body>
+  <div class="header">🐝 Beehive Monitor - Live</div>
+
+  <div class="container">
+    <div class="card">
+      <div class="emoji">🌡️</div>
+      <div class="label">Temperature</div>
+      <div class="value"><span id="temp">--</span> °C</div>
+    </div>
+
+    <div class="card">
+      <div class="emoji">💧</div>
+      <div class="label">Humidity</div>
+      <div class="value"><span id="hum">--</span> %</div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <a href="history.html" class="card-tile">📈 View History Chart</a>
+  </div>
+
+  <button class="toggle" onclick="toggleDark()">🌙</button>
+
+  <script>
+    // Theme toggle logic
+    if (localStorage.dark === 'true') document.body.classList.add('dark');
+    function toggleDark() {
+      document.body.classList.toggle('dark');
+      localStorage.dark = document.body.classList.contains('dark');
+    }
+
+    // Firebase connection
+    var firebaseConfig = {
+      apiKey: "AIzaSyD4M_ZOMqR9MtSkbgH2SQQvj2QSAFKLOhU",
+      authDomain: "beehive-d31e3.firebaseapp.com",
+      databaseURL: "https://beehive-d31e3-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "beehive-d31e3",
+    };
+    firebase.initializeApp(firebaseConfig);
+    var db = firebase.database();
+
+    db.ref("beehive").on("value", function(snapshot) {
+      const data = snapshot.val() || {};
+      document.getElementById("temp").innerText = data.temperature ?? "--";
+      document.getElementById("hum").innerText = data.humidity ?? "--";
+    });
+  </script>
+</body>
+</html>
