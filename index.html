@@ -51,12 +51,13 @@
 
     .card {
       background-color: var(--card);
+      border: 4px solid transparent;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       padding: 20px;
       width: 220px;
       text-align: center;
-      transition: transform 0.2s;
+      transition: transform 0.2s, border-color 0.3s ease;
     }
 
     .card:hover {
@@ -116,6 +117,16 @@
       font-size: 18px;
       font-family: 'Times New Roman', Times, serif;
     }
+
+    .pulse {
+      animation: pulseBorder 1s infinite;
+    }
+
+    @keyframes pulseBorder {
+      0%   { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.6); }
+      70%  { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+    }
   </style>
 
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -125,19 +136,19 @@
   <div class="header">🐝 Beehive Monitor - Live</div>
 
   <div class="container">
-    <div class="card">
+    <div class="card" id="card-temp">
       <div class="emoji">🌡️</div>
       <div class="label">Temperature</div>
       <div class="value"><span id="temp">--</span> °C</div>
     </div>
 
-    <div class="card">
+    <div class="card" id="card-hum">
       <div class="emoji">💧</div>
       <div class="label">Humidity</div>
       <div class="value"><span id="hum">--</span> %</div>
     </div>
 
-    <div class="card">
+    <div class="card" id="card-air">
       <div class="emoji">🧪</div>
       <div class="label">Air Purity</div>
       <div class="value"><span id="air">--</span> %</div>
@@ -151,14 +162,13 @@
   <button class="toggle" onclick="toggleDark()">🌙</button>
 
   <script>
-    // Theme toggle logic
     if (localStorage.dark === 'true') document.body.classList.add('dark');
     function toggleDark() {
       document.body.classList.toggle('dark');
       localStorage.dark = document.body.classList.contains('dark');
     }
 
-    // Firebase connection
+    // Firebase config
     var firebaseConfig = {
       apiKey: "AIzaSyD4M_ZOMqR9MtSkbgH2SQQvj2QSAFKLOhU",
       authDomain: "beehive-d31e3.firebaseapp.com",
@@ -168,11 +178,31 @@
     firebase.initializeApp(firebaseConfig);
     var db = firebase.database();
 
+    // Border pulse logic
+    function updateCardBorder(el, value, min, max) {
+      el.classList.remove('pulse');
+      let color = "#2ecc71"; // green
+      if (value < min || value > max) {
+        color = "#e74c3c"; // red
+        el.classList.add('pulse');
+      }
+      el.style.borderColor = color;
+    }
+
+    // Listen to Firebase
     db.ref("beehive").on("value", function(snapshot) {
       const data = snapshot.val() || {};
-      document.getElementById("temp").innerText = data.temperature ?? "--";
-      document.getElementById("hum").innerText = data.humidity ?? "--";
-      document.getElementById("air").innerText = data.air_quality ?? "--";
+      const temp = data.temperature ?? "--";
+      const hum = data.humidity ?? "--";
+      const air = data.air_quality ?? "--";
+
+      document.getElementById("temp").innerText = temp;
+      document.getElementById("hum").innerText = hum;
+      document.getElementById("air").innerText = air;
+
+      if (temp !== "--") updateCardBorder(document.getElementById("card-temp"), temp, 18, 30);
+      if (hum !== "--")  updateCardBorder(document.getElementById("card-hum"), hum, 70);
+      if (air !== "--")  updateCardBorder(document.getElementById("card-air"), air, 60, 100);
     });
   </script>
 </body>
