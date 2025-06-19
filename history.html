@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
   <link rel="manifest" href="manifest.json">
-
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Beehive Monitor</title>
@@ -131,7 +130,7 @@
 </head>
 <body>
 
-  <div class="header">🐝 Beehive Temp & Humidity Monitor</div>
+  <div class="header">🐝 Beehive Temp, Humidity & Air Purity Monitor</div>
 
   <div class="buttons">
     <button onclick="loadData('live')">Live</button>
@@ -171,7 +170,7 @@
     let chart;
     const ctx = document.getElementById('chart').getContext('2d');
 
-    function createChart(labels, temps, hums, fullLabels) {
+    function createChart(labels, temps, hums, airs, fullLabels) {
       if (chart) chart.destroy();
 
       chart = new Chart(ctx, {
@@ -180,7 +179,8 @@
           labels,
           datasets: [
             { label: '🌡 Temp (°C)', data: temps, borderColor: '#ff5733', fill: false, tension: 0.3 },
-            { label: '💧 Humidity (%)', data: hums, borderColor: '#3399ff', fill: false, tension: 0.3 }
+            { label: '💧 Humidity (%)', data: hums, borderColor: '#3399ff', fill: false, tension: 0.3 },
+            { label: '🍃 Air Purity (%)', data: airs, borderColor: '#22bb66', fill: false, tension: 0.3 }
           ]
         },
         options: {
@@ -227,7 +227,7 @@
 
       db.ref('history').once('value').then(snap => {
         const raw = snap.val() || {};
-        const labels = [], temps = [], hums = [], fullLabels = [];
+        const labels = [], temps = [], hums = [], airs = [], fullLabels = [];
         const now = new Date();
         const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
 
@@ -266,11 +266,12 @@
             labels.push(label);
             temps.push(v.temperature);
             hums.push(v.humidity);
+            airs.push(v.air_quality);  // 👈 Add air_quality here
             fullLabels.push(full);
           }
         });
 
-        createChart(labels, temps, hums, fullLabels);
+        createChart(labels, temps, hums, airs, fullLabels);
         document.getElementById('loader').style.display = 'none';
       });
     }
