@@ -7,18 +7,12 @@
 
   <style>
     :root {
-      --bg: #f9fbff;
-      --fg: #333;
-      --card: #fff;
-      --buttonBg: #2d3e50;
-      --buttonFg: #fff;
+      --bg: #f9fbff; --fg: #333;
+      --card: #fff; --buttonBg: #2d3e50; --buttonFg: #fff;
     }
     .dark {
-      --bg: #2b2e3b;
-      --fg: #ddd;
-      --card: #3a3f4b;
-      --buttonBg: #ddd;
-      --buttonFg: #2d3e50;
+      --bg: #2b2e3b; --fg: #ddd;
+      --card: #3a3f4b; --buttonBg: #ddd; --buttonFg: #2d3e50;
     }
 
     body {
@@ -27,7 +21,6 @@
       padding: 20px;
       background: var(--bg);
       color: var(--fg);
-      transition: background 0.3s ease, color 0.3s ease;
     }
 
     .header {
@@ -64,21 +57,9 @@
       transform: scale(1.03);
     }
 
-    .emoji {
-      font-size: 36px;
-      margin-bottom: 10px;
-    }
-
-    .label {
-      font-weight: 600;
-      font-size: 18px;
-      margin-bottom: 5px;
-    }
-
-    .value {
-      font-size: 24px;
-      color: var(--fg);
-    }
+    .emoji { font-size: 36px; margin-bottom: 10px; }
+    .label { font-weight: 600; font-size: 18px; margin-bottom: 5px; }
+    .value { font-size: 24px; color: var(--fg); }
 
     .nav {
       display: flex;
@@ -87,8 +68,7 @@
     }
 
     .card-tile {
-      display: inline-block;
-      background-color: var(--card);
+      background: var(--card);
       border-radius: 16px;
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
       padding: 10px 25px;
@@ -96,7 +76,7 @@
       font-weight: 600;
       color: var(--buttonBg);
       text-decoration: none;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
 
     .card-tile:hover {
@@ -113,8 +93,8 @@
       border: none;
       padding: 10px;
       border-radius: 50%;
-      cursor: pointer;
       font-size: 18px;
+      cursor: pointer;
     }
 
     .pulse {
@@ -122,8 +102,8 @@
     }
 
     @keyframes pulseBorder {
-      0%   { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.6); }
-      70%  { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+      0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.6); }
+      70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
       100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
     }
 
@@ -147,149 +127,124 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
+<audio id="alertSound" src="alert.mp3" preload="auto" loop></audio>
 
-  <audio id="alertSound" src="alert.mp3" preload="auto" loop></audio>
+<div class="header">🐝 Beehive Monitor - Live</div>
 
-  <div class="header">🐝 Beehive Monitor - Live</div>
-
-  <div class="container">
-    <div class="card" id="card-temp">
-      <div class="emoji">🌡️</div>
-      <div class="label">Temperature</div>
-      <div class="value"><span id="temp">--</span> °C</div>
-    </div>
-
-    <div class="card" id="card-hum">
-      <div class="emoji">💧</div>
-      <div class="label">Humidity</div>
-      <div class="value"><span id="hum">--</span> %</div>
-    </div>
-
-    <div class="card" id="card-air">
-      <div class="emoji">🧪</div>
-      <div class="label">Air Purity</div>
-      <div class="value"><span id="air">--</span> %</div>
-    </div>
+<div class="container">
+  <div class="card" id="card-temp">
+    <div class="emoji">🌡️</div>
+    <div class="label">Temperature</div>
+    <div class="value"><span id="temp">--</span> °C</div>
   </div>
-
-  <div class="nav">
-    <a href="history.html" class="card-tile">📈 View History Chart</a>
+  <div class="card" id="card-hum">
+    <div class="emoji">💧</div>
+    <div class="label">Humidity</div>
+    <div class="value"><span id="hum">--</span> %</div>
   </div>
+  <div class="card" id="card-air">
+    <div class="emoji">🧪</div>
+    <div class="label">Air Purity</div>
+    <div class="value"><span id="air">--</span> %</div>
+  </div>
+</div>
 
-  <div id="connection-status">Checking status...</div>
+<div class="nav">
+  <a href="history.html" class="card-tile">📈 View History Chart</a>
+</div>
 
-  <button class="toggle" onclick="toggleDark()">🌙</button>
+<div id="connection-status">Checking status...</div>
+<button class="toggle" onclick="toggleDark()">🌙</button>
 
-  <script>
-    if (localStorage.dark === 'true') document.body.classList.add('dark');
-    function toggleDark() {
-      document.body.classList.toggle('dark');
-      localStorage.dark = document.body.classList.contains('dark');
+<script>
+  if (localStorage.dark === 'true') document.body.classList.add('dark');
+  function toggleDark() {
+    document.body.classList.toggle('dark');
+    localStorage.dark = document.body.classList.contains('dark');
+  }
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyD4M_ZOMqR9MtSkbgH2SQQvj2QSAFKLOhU",
+    authDomain: "beehive-d31e3.firebaseapp.com",
+    databaseURL: "https://beehive-d31e3-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "beehive-d31e3",
+  };
+  firebase.initializeApp(firebaseConfig);
+
+  const db = firebase.database();
+  const audio = document.getElementById("alertSound");
+  const statusEl = document.getElementById("connection-status");
+
+  let lastNotified = false;
+
+  function updateCardBorder(el, danger) {
+    el.classList.remove('pulse');
+    el.style.borderColor = danger ? "#e74c3c" : "#2ecc71";
+    if (danger) el.classList.add('pulse');
+  }
+
+  function formatTimeAgo(ts) {
+    const now = new Date();
+    const then = new Date(ts);
+    const diff = Math.floor((now - then) / 1000);
+    if (diff < 60) return `${diff}s ago`;
+    if (diff < 3600) return `${Math.floor(diff/60)}m ago`;
+    return then.toLocaleTimeString();
+  }
+
+  function showNotification(title, body) {
+    if (Notification.permission === "granted" && !lastNotified) {
+      new Notification(title, { body });
+      lastNotified = true;
+      setTimeout(() => { lastNotified = false }, 10000); // Reset after 10s
+    }
+  }
+
+  db.ref("beehive").on("value", snap => {
+    const d = snap.val() || {};
+    const temp = parseFloat(d.temperature ?? "--");
+    const hum  = parseFloat(d.humidity ?? "--");
+    const air  = parseFloat(d.air_quality ?? "--");
+    const time = d.last_time ?? null;
+
+    document.getElementById("temp").innerText = isNaN(temp) ? "--" : temp;
+    document.getElementById("hum").innerText  = isNaN(hum)  ? "--" : hum;
+    document.getElementById("air").innerText  = isNaN(air)  ? "--" : air;
+
+    const tempRed = !isNaN(temp) && (temp < 18 || temp > 30);
+    const humRed  = !isNaN(hum)  && hum < 60;
+    const airRed  = !isNaN(air)  && air < 60;
+
+    updateCardBorder(document.getElementById("card-temp"), tempRed);
+    updateCardBorder(document.getElementById("card-hum"), humRed);
+    updateCardBorder(document.getElementById("card-air"), airRed);
+
+    if (tempRed || humRed || airRed) {
+      if (audio.paused) audio.play();
+      showNotification("🚨 Abnormal Sensor Values", "One or more values in RED zone!");
+    } else {
+      audio.pause(); audio.currentTime = 0;
     }
 
-    // Firebase Setup
-    const config = {
-      apiKey: "AIzaSyD4M_ZOMqR9MtSkbgH2SQQvj2QSAFKLOhU",
-      authDomain: "beehive-d31e3.firebaseapp.com",
-      databaseURL: "https://beehive-d31e3-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "beehive-d31e3"
-    };
-    firebase.initializeApp(config);
-    const db = firebase.database();
+    // Connection status
+    if (time) {
+      const diff = (new Date() - new Date(time)) / 1000;
+      if (diff < 15) {
+        statusEl.textContent = "Device Online";
+        statusEl.style.background = "#d4edda";
+        statusEl.style.color = "#155724";
+      } else {
+        statusEl.textContent = `Offline – Last seen ${formatTimeAgo(time)}`;
+        statusEl.style.background = "#f8d7da";
+        statusEl.style.color = "#721c24";
+      }
+    }
+  });
 
-    const audio = document.getElementById("alertSound");
-    const statusEl = document.getElementById("connection-status");
-
-    // Ask for notification permission
+  // Request permission for notifications
+  if ("Notification" in window && Notification.permission !== "granted") {
     Notification.requestPermission();
-
-    const notified = {
-      temperature: false,
-      humidity: false,
-      air_quality: false
-    };
-
-    function notifyOnce(sensor, msg) {
-      if (Notification.permission === "granted" && !notified[sensor]) {
-        new Notification("⚠️ Beehive Alert", { body: msg });
-        notified[sensor] = true;
-      }
-    }
-
-    function updateCardBorder(el, isRed) {
-      el.classList.remove("pulse");
-      let color = "#2ecc71";
-      if (isRed) {
-        color = "#e74c3c";
-        el.classList.add("pulse");
-      }
-      el.style.borderColor = color;
-    }
-
-    function formatTimeAgo(timestamp) {
-      const time = new Date(timestamp);
-      const now = new Date();
-      const diff = Math.floor((now - time) / 1000);
-      if (diff < 60) return `${diff}s ago`;
-      if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-      if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-      return time.toLocaleString();
-    }
-
-    db.ref("beehive").on("value", snap => {
-      const data = snap.val() || {};
-      const temp = parseFloat(data.temperature ?? "--");
-      const hum  = parseFloat(data.humidity ?? "--");
-      const air  = parseFloat(data.air_quality ?? "--");
-      const lastTime = data.last_time ?? null;
-
-      document.getElementById("temp").innerText = isNaN(temp) ? "--" : temp;
-      document.getElementById("hum").innerText  = isNaN(hum) ? "--" : hum;
-      document.getElementById("air").innerText  = isNaN(air) ? "--" : air;
-
-      const redTemp = !isNaN(temp) && (temp < 18 || temp > 30);
-      const redHum  = !isNaN(hum)  && hum < 60;
-      const redAir  = !isNaN(air)  && air < 60;
-
-      updateCardBorder(document.getElementById("card-temp"), redTemp);
-      updateCardBorder(document.getElementById("card-hum"),  redHum);
-      updateCardBorder(document.getElementById("card-air"),  redAir);
-
-      if (redTemp || redHum || redAir) {
-        if (audio.paused) audio.play();
-      } else {
-        audio.pause();
-        audio.currentTime = 0;
-      }
-
-      // Notifications
-      if (redTemp) notifyOnce("temperature", `Temperature abnormal: ${temp}°C`);
-      else notified.temperature = false;
-
-      if (redHum) notifyOnce("humidity", `Humidity too low: ${hum}%`);
-      else notified.humidity = false;
-
-      if (redAir) notifyOnce("air_quality", `Air purity poor: ${air}%`);
-      else notified.air_quality = false;
-
-      // Device online indicator
-      if (lastTime) {
-        const diff = (new Date() - new Date(lastTime)) / 1000;
-        if (diff < 15) {
-          statusEl.textContent = "Device Online";
-          statusEl.style.background = "#d4edda";
-          statusEl.style.color = "#155724";
-        } else {
-          statusEl.textContent = `Offline – Last seen: ${formatTimeAgo(lastTime)}`;
-          statusEl.style.background = "#f8d7da";
-          statusEl.style.color = "#721c24";
-        }
-      } else {
-        statusEl.textContent = "Status Unknown";
-        statusEl.style.background = "#fef3cd";
-        statusEl.style.color = "#856404";
-      }
-    });
-  </script>
+  }
+</script>
 </body>
 </html>
