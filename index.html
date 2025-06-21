@@ -340,7 +340,7 @@
   function showNotification(t, b) { if (Notification.permission === "granted") { new Notification(t, { body: b }); navigator.vibrate?.([300, 200, 300]); } }
   function formatTimeAgo(ts) { const diff = (Date.now() - new Date(ts)) / 1000; if (diff < 60) return `${Math.floor(diff)}s ago`; if (diff < 3600) return `${Math.floor(diff / 60)}m ago`; return new Date(ts).toLocaleTimeString(); }
   
-  db.ref(".info/connected").on("value", snap => { statusEl.textContent = snap.val() ? "🟢 Firebase Online" : "🔴 Firebase Offline"; });
+  db.ref(".info/connected").on("value", snap => { statusEl.textContent = snap.val() ? "Firebase Online" : "Firebase Offline"; });
   
   db.ref("beehive").on("value", snap => {
     const d = snap.val() || {};
@@ -374,8 +374,8 @@
     const last = d.last_time;
     if (last) {
       const diff = (Date.now() - new Date(last)) / 1000;
-      if (diff < 15) { statusEl.textContent = "🟢 Device Online"; statusEl.style.background = "#d4edda"; statusEl.style.color = "#155724"; }
-      else { statusEl.textContent = `🔴 Offline – Last seen ${formatTimeAgo(last)}`; statusEl.style.background = "#f8d7da"; statusEl.style.color = "#721c24"; }
+      if (diff < 15) { statusEl.textContent = "Device Online"; statusEl.style.background = "#d4edda"; statusEl.style.color = "#155724"; }
+      else { statusEl.textContent = `Offline – Last seen ${formatTimeAgo(last)}`; statusEl.style.background = "#f8d7da"; statusEl.style.color = "#721c24"; }
     }
   });
 
