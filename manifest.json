@@ -1,21 +1,36 @@
 {
   "name": "Beehive Monitor",
   "short_name": "BeeMonitor",
-  "start_url": "index.html",
+  "description": "A live monitor for beehive temperature, humidity, and air purity.",
+  "start_url": "/index.html",
   "display": "standalone",
-  "background_color": "#f9fbff",
+  "background_color": "#2b2e3b",
   "theme_color": "#2d3e50",
-  "orientation": "portrait",
+  "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "icons/icon-192.png",
+      "src": "icons/icon-192.jpg",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/jpeg",
+      "purpose": "any"
     },
     {
-      "src": "icons/icon-512.png",
+      "src": "icons/icon-512.jpg",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-192.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-512.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "maskable"
     }
   ]
 }
