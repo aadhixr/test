@@ -53,28 +53,27 @@
      z-index: 1001;
      display: flex;
      flex-direction: column;
-     justify-content: center; /* <-- CORRECTED: Centers the group of bars */
-     gap: 5px; /* <-- ADDED: Creates a nice space between the bars */
+     justify-content: center;
+     gap: 5px;
      padding: 5px;
     }
     .menu-icon span {
-    display: block;
-    height: 4px;
-    width: 100%;
-    background-color: #000; /* <-- REPLACE WITH THIS LINE */
-    border-radius: 2px;
-    transition: all 0.3s ease-in-out;
+      display: block;
+      height: 4px;
+      width: 100%;
+      background-color: #000;
+      border-radius: 2px;
+      transition: all 0.3s ease-in-out;
     }
     .menu-icon.open span:nth-child(1) {
-      transform: translateY(11px) rotate(45deg);
+      transform: translateY(9px) rotate(45deg);
     }
     .menu-icon.open span:nth-child(2) {
       opacity: 0;
     }
     .menu-icon.open span:nth-child(3) {
-      transform: translateY(-11px) rotate(-45deg);
+      transform: translateY(-9px) rotate(-45deg);
     }
-
     .sidebar {
       height: 100%;
       width: 250px;
@@ -115,6 +114,36 @@
       font-size: 24px;
       cursor: pointer;
     }
+    .sidebar .card-tile {
+      text-decoration: none;
+      background: var(--card);
+      color: var(--buttonBg);
+      border: 1px solid var(--buttonBg);
+      padding: 10px 25px;
+      border-radius: 16px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+      font-size: 14px;
+      font-weight: bold;
+      font-family: 'Times New Roman', Times, serif;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+    .sidebar .card-tile:hover {
+       background: var(--buttonBg);
+       color: var(--buttonFg);
+    }
+    /* --- ADDED: Style for when the button is disabled --- */
+    .sidebar .card-tile:disabled {
+        cursor: not-allowed;
+        background-color: #eee;
+        color: #888;
+        border-color: #ccc;
+    }
+    .dark .sidebar .card-tile:disabled {
+        background-color: #555;
+        color: #aaa;
+        border-color: #666;
+    }
   </style>
 </head>
 <body>
@@ -131,8 +160,8 @@
   <div class="toggle-container">
     <span>Theme</span>
     <button class="toggle" onclick="toggleDark()">🌙</button>
-    <button class="card-tile" onclick="enableNotifications()">Enable Notifications</button>
   </div>
+  <button id="notificationBtn" class="card-tile" onclick="enableNotifications()">Enable Notifications</button>
 </div>
 
 <audio id="alertSound" src="alert.mp3" preload="auto" loop></audio>
@@ -207,6 +236,40 @@
     updateChartThemes();
   }
 
+  // MODIFIED: This function now just handles the permission request
+  function enableNotifications() {
+    Notification.requestPermission().then(permission => {
+      // After the user makes a choice, update the button state
+      updateNotificationButtonStatus(); 
+    });
+  }
+  
+  // NEW: This function checks permission and updates the button
+  function updateNotificationButtonStatus() {
+    // Check if Notifications are even supported by the browser
+    if (!('Notification' in window)) {
+        document.getElementById('notificationBtn').textContent = 'Not Supported';
+        document.getElementById('notificationBtn').disabled = true;
+        return;
+    }
+    
+    const notificationBtn = document.getElementById('notificationBtn');
+    switch (Notification.permission) {
+        case 'granted':
+            notificationBtn.textContent = 'Notification Enabled';
+            notificationBtn.disabled = true;
+            break;
+        case 'denied':
+            notificationBtn.textContent = 'Notifications Blocked';
+            notificationBtn.disabled = true;
+            break;
+        default: // 'default'
+            notificationBtn.textContent = 'Enable Notifications';
+            notificationBtn.disabled = false;
+            break;
+    }
+  }
+
   const liveLabels = [];
   const liveData = { temp: [], hum: [], air: [] };
   const CHART_HISTORY_LENGTH = 30;
@@ -277,7 +340,7 @@
   function showNotification(t, b) { if (Notification.permission === "granted") { new Notification(t, { body: b }); navigator.vibrate?.([300, 200, 300]); } }
   function formatTimeAgo(ts) { const diff = (Date.now() - new Date(ts)) / 1000; if (diff < 60) return `${Math.floor(diff)}s ago`; if (diff < 3600) return `${Math.floor(diff / 60)}m ago`; return new Date(ts).toLocaleTimeString(); }
   
-  db.ref(".info/connected").on("value", snap => { statusEl.textContent = snap.val() ? "Firebase Online" : "Firebase Offline"; });
+  db.ref(".info/connected").on("value", snap => { statusEl.textContent = snap.val() ? "🟢 Firebase Online" : "🔴 Firebase Offline"; });
   
   db.ref("beehive").on("value", snap => {
     const d = snap.val() || {};
@@ -311,8 +374,8 @@
     const last = d.last_time;
     if (last) {
       const diff = (Date.now() - new Date(last)) / 1000;
-      if (diff < 15) { statusEl.textContent = "Device Online"; statusEl.style.background = "#d4edda"; statusEl.style.color = "#155724"; }
-      else { statusEl.textContent = `Offline – Last seen ${formatTimeAgo(last)}`; statusEl.style.background = "#f8d7da"; statusEl.style.color = "#721c24"; }
+      if (diff < 15) { statusEl.textContent = "🟢 Device Online"; statusEl.style.background = "#d4edda"; statusEl.style.color = "#155724"; }
+      else { statusEl.textContent = `🔴 Offline – Last seen ${formatTimeAgo(last)}`; statusEl.style.background = "#f8d7da"; statusEl.style.color = "#721c24"; }
     }
   });
 
@@ -395,7 +458,8 @@
     });
   }
 
-  document.addEventListener("DOMContentLoaded", () => { Notification.requestPermission(); });
+  // Set the initial state of the notification button when the page loads
+  updateNotificationButtonStatus();
 </script>
 
 <script>
