@@ -40,35 +40,52 @@
     .chart-buttons button:hover, .chart-buttons button.active { background: var(--buttonBg); color: var(--buttonFg); }
     #loader { display: none; text-align: center; margin-top: 20px; font-size: 18px; font-style: italic; }
 
-    /* --- NEW SIDEBAR STYLES --- */
+    /* --- Sidebar and Menu Icon Styles --- */
     .menu-icon {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      width: 50px;
-      height: 40px;
-      background: var(--buttonBg);
-      color: var(--buttonFg);
-      border: none;
-      border-radius: 8px;
-      font-size: 24px;
-      cursor: pointer;
-      z-index: 1001;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+     position: fixed;
+     top: 20px;
+     left: 20px;
+     width: 40px;
+     height: 35px;
+     background: none;
+     border: none;
+     cursor: pointer;
+     z-index: 1001;
+     display: flex;
+     flex-direction: column;
+     justify-content: center; /* <-- CORRECTED: Centers the group of bars */
+     gap: 5px; /* <-- ADDED: Creates a nice space between the bars */
+     padding: 5px;
     }
+    .menu-icon span {
+    display: block;
+    height: 4px;
+    width: 100%;
+    background-color: #000; /* <-- REPLACE WITH THIS LINE */
+    border-radius: 2px;
+    transition: all 0.3s ease-in-out;
+    }
+    .menu-icon.open span:nth-child(1) {
+      transform: translateY(11px) rotate(45deg);
+    }
+    .menu-icon.open span:nth-child(2) {
+      opacity: 0;
+    }
+    .menu-icon.open span:nth-child(3) {
+      transform: translateY(-11px) rotate(-45deg);
+    }
+
     .sidebar {
       height: 100%;
       width: 250px;
       position: fixed;
       z-index: 1000;
       top: 0;
-      left: -250px; /* Initially hidden */
+      left: -250px;
       background-color: var(--card);
       box-shadow: 2px 0 5px rgba(0,0,0,0.1);
       padding-top: 80px;
-      transition: 0.3s;
+      transition: 0.3s ease-in-out;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -102,7 +119,11 @@
 </head>
 <body>
 
-<button class="menu-icon" onclick="toggleSidebar()">&#9776;</button>
+<button class="menu-icon" onclick="toggleSidebar()">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
 
 <div id="sidebar" class="sidebar">
   <h3>Settings</h3>
@@ -161,9 +182,9 @@
 <div id="loader">Loading chart...</div>
 
 <script>
-  // NEW: Sidebar toggle function
   function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('open');
+    document.querySelector('.menu-icon').classList.toggle('open');
   }
 
   const firebaseConfig = {
